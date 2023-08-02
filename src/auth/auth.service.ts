@@ -6,6 +6,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import * as jwt from 'jsonwebtoken';
 import * as url from 'url';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async singup(createUserDto: CreateUserDto) {
@@ -77,6 +79,12 @@ export class AuthService {
       `${clientURL}`,
       `forgot-password/${existUser.id}/${token}`,
     );
+    // console.log(existUser.email);
+    // console.log(resolvedUrl);
+    await this.mailService.sendTestMail({
+      email: existUser.email,
+      url: resolvedUrl,
+    });
     return resolvedUrl;
   }
 }

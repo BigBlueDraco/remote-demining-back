@@ -12,11 +12,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         transport: {
-          host: configService.get<string>('SMTP'),
-          secure: false,
+          host: 'smtp.gmail.com',
+          port: 465,
+          ignoreTLS: true,
           auth: {
             user: configService.get<string>('GMAIL_LOGIN'),
             pass: configService.get<string>('GMAIL_PASS'),
+          },
+        },
+        defaults: {
+          from: '"No Reply" <noreply@example.com>',
+        },
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
           },
         },
       }),
