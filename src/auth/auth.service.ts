@@ -2,13 +2,17 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 import { hash, compare } from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config/dist/config.service';
+import * as jwt from 'jsonwebtoken';
+import * as url from 'url';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async singup(createUserDto: CreateUserDto) {
@@ -54,5 +58,25 @@ export class AuthService {
       }),
       user: { email: existUser.email },
     };
+  }
+  async forgotPassword(email: string) {
+    const existUser = await this.userService.findOneByEmail(email);
+    if (!existUser) {
+      throw new HttpException(`User not found`, HttpStatus.CONFLICT);
+    }
+    const clientURL = this.configService.get<string>('CLIENT_URL');
+    const secret =
+      this.configService.get<string>('SECRET') + existUser.password;
+    const payload = {
+      email: existUser.email,
+      id: existUser.id,
+    };
+    const expiresIn = '1h';
+    const token = jwt.sign(payload, secret, { expiresIn });
+    const resolvedUrl = url.resolve(
+      `${clientURL}`,
+      `forgot-password/${existUser.id}/${token}`,
+    );
+    return resolvedUrl;
   }
 }
