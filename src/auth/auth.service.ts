@@ -62,7 +62,9 @@ export class AuthService {
     };
   }
   async forgotPassword(email: string) {
-    const existUser = await this.userService.findOneByEmail(email);
+    const existUser = await this.userService.findOneByEmail(
+      email.toLowerCase(),
+    );
     if (!existUser) {
       throw new HttpException(`User not found`, HttpStatus.CONFLICT);
     }
@@ -84,5 +86,30 @@ export class AuthService {
       url: resolvedUrl,
     });
     return 'Email send';
+  }
+  async resetPassword(
+    id: string,
+    token: string,
+    forgotPassword: { password: string; confirmPassword: string },
+  ) {
+    try {
+      const { password, confirmPassword } = forgotPassword;
+      if (password !== confirmPassword) {
+        throw new HttpException(
+          `Password and Confirm Password must be equle`,
+          HttpStatus.CONFLICT,
+        );
+      }
+      const user = await this.userService.findOneById(id);
+      if (!user) {
+        throw new HttpException(`User not found`, HttpStatus.CONFLICT);
+      }
+      const secret = this.configService.get<string>('SECRET') + user.password;
+      const payload = await jwt.verify(token, secret);
+      const hashedPassword = await hash(password, 10);
+      return await this.userService.update(id, { password: hashedPassword });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

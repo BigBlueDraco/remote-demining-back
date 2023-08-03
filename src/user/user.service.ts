@@ -30,9 +30,24 @@ export class UserService {
     const user = await this.userModel.findOne({ email: email.toLowerCase() });
     return user;
   }
+  async findOneById(id: string) {
+    const user = await this.userModel.findById(id);
+    console.log(user);
+    return user;
+  }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        id,
+        updateUserDto,
+        { new: true },
+      );
+      console.log(updatedUser);
+      return updatedUser;
+    } catch (err) {
+      throw err;
+    }
   }
 
   remove(id: number) {
