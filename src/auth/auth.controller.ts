@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './guards/JwtGuard';
@@ -30,7 +31,21 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('authPing')
+  @Post('change-password')
+  changePassword(
+    @Headers() headers,
+    @Body()
+    changePassword: {
+      password: string;
+      confirmPassword: string;
+    },
+  ) {
+    const jwt = headers.authorization.split(' ')[1];
+    return this.authService.changePassword(jwt, changePassword);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('auth-ping')
   test(@Body() createdUser: CreateUserDto) {
     return true;
   }

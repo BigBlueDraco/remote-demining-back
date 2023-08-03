@@ -37,6 +37,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign({
+        id: newUser.id,
         email: newUser.email,
       }),
       user: { email: newUser.email },
@@ -56,6 +57,7 @@ export class AuthService {
     }
     return {
       access_token: this.jwtService.sign({
+        id: existUser.id,
         email: existUser.email,
       }),
       user: { email: existUser.email },
@@ -93,23 +95,50 @@ export class AuthService {
     forgotPassword: { password: string; confirmPassword: string },
   ) {
     try {
-      const { password, confirmPassword } = forgotPassword;
-      if (password !== confirmPassword) {
-        throw new HttpException(
-          `Password and Confirm Password must be equle`,
-          HttpStatus.CONFLICT,
-        );
-      }
+      this.checkPasswordConfirming(forgotPassword);
       const user = await this.userService.findOneById(id);
       if (!user) {
         throw new HttpException(`User not found`, HttpStatus.CONFLICT);
       }
       const secret = this.configService.get<string>('SECRET') + user.password;
       const payload = await jwt.verify(token, secret);
-      const hashedPassword = await hash(password, 10);
+      const hashedPassword = await hash(forgotPassword, 10);
       return await this.userService.update(id, { password: hashedPassword });
     } catch (e) {
       console.log(e);
     }
+  }
+  checkPasswordConfirming(passwordGroup: {
+    password: string;
+    confirmPassword: string;
+  }) {
+    const { password, confirmPassword } = passwordGroup;
+    if (password !== confirmPassword) {
+      throw new HttpException(
+        `Password and Confirm Password must be equle`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+  async changePassword(
+    jwt: string,
+    changePassword: {
+      password: string;
+      confirmPassword: string;
+    },
+  ) {
+    const payload: any = this.jwtService.decode(jwt);
+    this.checkPasswordConfirming(changePassword);
+    const user = await this.userService.findOneById(payload?.id);
+    if (!user) {
+      throw new HttpException(`User not found`, HttpStatus.CONFLICT);
+    }
+    const hashedPassword = await hash(changePassword.password, 10);
+    const newUser = await this.userService.update(payload?.id, {
+      password: hashedPassword,
+    });
+    const { password: pass, ...rest } = newUser;
+    const { password: pass2, ...res } = rest['_doc'];
+    return res;
   }
 }
