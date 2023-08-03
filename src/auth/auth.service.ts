@@ -79,12 +79,10 @@ export class AuthService {
       `${clientURL}`,
       `forgot-password/${existUser.id}/${token}`,
     );
-    // console.log(existUser.email);
-    // console.log(resolvedUrl);
-    await this.mailService.sendTestMail({
+    await this.mailService.sendForgotPasswordMail({
       email: existUser.email,
       url: resolvedUrl,
     });
-    return resolvedUrl;
+    return 'Email send';
   }
 }
