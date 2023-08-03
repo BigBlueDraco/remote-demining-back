@@ -1,7 +1,15 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { Headers } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import {
+  Body,
+  Controller,
+  Headers,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login';
+import { SingupDto } from './dto/singup';
 import { JwtAuthGuard } from './guards/JwtGuard';
 
 @Controller('auth')
@@ -9,11 +17,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('singup')
-  singup(@Body() createdUser: CreateUserDto) {
+  singup(@Body() createdUser: SingupDto) {
     return this.authService.singup(createdUser);
   }
   @Post('login')
-  login(@Body() createdUser: CreateUserDto) {
+  login(@Body() createdUser: LoginDto) {
     return this.authService.login(createdUser);
   }
 

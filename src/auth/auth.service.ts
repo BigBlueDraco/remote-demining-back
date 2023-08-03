@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { UserService } from 'src/user/user.service';
-import { hash, compare } from 'bcrypt';
-import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config/dist/config.service';
+import { JwtService } from '@nestjs/jwt';
+import { compare, hash } from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import * as url from 'url';
 import { MailService } from 'src/mail/mail.service';
+import { UserService } from 'src/user/user.service';
+import * as url from 'url';
+import { LoginDto } from './dto/login';
+import { PassworGroupDto } from './dto/password-group';
+import { SingupDto } from './dto/singup';
 
 @Injectable()
 export class AuthService {
@@ -17,8 +19,9 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async singup(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
+  async singup(createUserDto: SingupDto) {
+    const { email, passwordCheckGroup } = createUserDto;
+    this.checkPasswordConfirming(passwordCheckGroup);
     const existUser = await this.userService.findOneByEmail(
       email.toLowerCase(),
     );
@@ -28,8 +31,7 @@ export class AuthService {
         HttpStatus.CONFLICT,
       );
     }
-
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(passwordCheckGroup.password, 10);
     const newUser = await this.userService.create({
       email: email.toLowerCase(),
       password: hashedPassword,
@@ -43,15 +45,12 @@ export class AuthService {
       user: { email: newUser.email },
     };
   }
-  async login(loginUser: CreateUserDto) {
+  async login(loginUser: LoginDto) {
     const { email, password } = loginUser;
     const existUser = await this.userService.findOneByEmail(
       email.toLowerCase(),
     );
-    const isValidPassword = await compare(
-      loginUser.password,
-      existUser.password,
-    );
+    const isValidPassword = await compare(password, existUser.password);
     if (!isValidPassword) {
       throw new HttpException(`Unvalid user data`, HttpStatus.CONFLICT);
     }
@@ -92,7 +91,7 @@ export class AuthService {
   async resetPassword(
     id: string,
     token: string,
-    forgotPassword: { password: string; confirmPassword: string },
+    forgotPassword: PassworGroupDto,
   ) {
     try {
       this.checkPasswordConfirming(forgotPassword);
@@ -101,17 +100,16 @@ export class AuthService {
         throw new HttpException(`User not found`, HttpStatus.CONFLICT);
       }
       const secret = this.configService.get<string>('SECRET') + user.password;
-      const payload = await jwt.verify(token, secret);
+      const payload: any = await jwt.verify(token, secret);
       const hashedPassword = await hash(forgotPassword, 10);
-      return await this.userService.update(id, { password: hashedPassword });
+      return await this.userService.update(payload.id, {
+        password: hashedPassword,
+      });
     } catch (e) {
       console.log(e);
     }
   }
-  checkPasswordConfirming(passwordGroup: {
-    password: string;
-    confirmPassword: string;
-  }) {
+  checkPasswordConfirming(passwordGroup: PassworGroupDto) {
     const { password, confirmPassword } = passwordGroup;
     if (password !== confirmPassword) {
       throw new HttpException(
@@ -120,13 +118,7 @@ export class AuthService {
       );
     }
   }
-  async changePassword(
-    jwt: string,
-    changePassword: {
-      password: string;
-      confirmPassword: string;
-    },
-  ) {
+  async changePassword(jwt: string, changePassword: PassworGroupDto) {
     const payload: any = this.jwtService.decode(jwt);
     this.checkPasswordConfirming(changePassword);
     const user = await this.userService.findOneById(payload?.id);
