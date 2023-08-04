@@ -20,8 +20,8 @@ export class AuthService {
   ) {}
 
   async singup(createUserDto: SingupDto) {
-    const { email, passwordCheckGroup } = createUserDto;
-    this.checkPasswordConfirming(passwordCheckGroup);
+    const { email, ...passwordGroup } = createUserDto;
+    this.checkPasswordConfirming(passwordGroup);
     const existUser = await this.userService.findOneByEmail(
       email.toLowerCase(),
     );
@@ -31,7 +31,7 @@ export class AuthService {
         HttpStatus.CONFLICT,
       );
     }
-    const hashedPassword = await hash(passwordCheckGroup.password, 10);
+    const hashedPassword = await hash(passwordGroup.password, 10);
     const newUser = await this.userService.create({
       email: email.toLowerCase(),
       password: hashedPassword,
