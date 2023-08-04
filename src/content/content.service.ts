@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { Content } from './schemas/content.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ContentService {
+  constructor(
+    @InjectModel('Content') private readonly contentModel: Model<Content>,
+  ) {}
   create(createContentDto: CreateContentDto) {
-    return 'This action adds a new content';
+    try {
+      return 'This action adds a new content';
+    } catch (e) {}
   }
 
   findAll() {
