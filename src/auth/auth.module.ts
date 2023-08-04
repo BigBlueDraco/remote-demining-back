@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/JwtStrategy';
 import { MailModule } from 'src/mail/mail.module';
+import { SwaggerModule } from '@nestjs/swagger';
 
 @Module({
   imports: [
