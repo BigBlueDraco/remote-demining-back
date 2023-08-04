@@ -17,6 +17,7 @@ import { JwtAuthGuard } from './guards/JwtGuard';
 import { PassworGroupDto } from './dto/password-group';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthUserRes } from './dto/auth-user-res';
+import { forgotPasswordDto } from './dto/forgot-password';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -39,9 +40,12 @@ export class AuthController {
 
   @Post('forgot-password')
   @UsePipes(ValidationPipe)
-  forgotPassword(@Body() forgotPassword: { email: string }) {
+  @ApiResponse({ status: 200, description: 'Email with link sended' })
+  @HttpCode(200)
+  forgotPassword(@Body() forgotPassword: forgotPasswordDto) {
     return this.authService.forgotPassword(forgotPassword.email);
   }
+
   @Post('forgot-password/:id/:token')
   @UsePipes(ValidationPipe)
   resetPassword(

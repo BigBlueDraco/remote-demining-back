@@ -13,8 +13,10 @@ export class LoginDto {
   email: string;
   @ApiProperty({
     description: 'User password',
-    example: 'password',
+    example: 'secretpassword',
     type: String,
+    minLength: 8,
+    maxLength: 64,
   })
   @IsNotEmpty()
   @IsString()
