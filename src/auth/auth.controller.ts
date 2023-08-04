@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Headers,
+  HttpCode,
   Param,
   Post,
   UseGuards,
@@ -14,27 +15,37 @@ import { LoginDto } from './dto/login';
 import { SingupDto } from './dto/singup';
 import { JwtAuthGuard } from './guards/JwtGuard';
 import { PassworGroupDto } from './dto/password-group';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthUserRes } from './dto/auth-user-res';
+import { forgotPasswordDto } from './dto/forgot-password';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('singup')
+  @ApiResponse({ status: 201, description: 'User created', type: AuthUserRes })
   @UsePipes(ValidationPipe)
-  singup(@Body() createdUser: SingupDto) {
+  singup(@Body() createdUser: SingupDto): Promise<AuthUserRes> {
     return this.authService.singup(createdUser);
   }
   @Post('login')
+  @ApiResponse({ status: 200, description: 'All good', type: AuthUserRes })
   @UsePipes(ValidationPipe)
-  login(@Body() createdUser: LoginDto) {
-    return this.authService.login(createdUser);
+  @HttpCode(200)
+  async login(@Body() createdUser: LoginDto): Promise<AuthUserRes> {
+    return await this.authService.login(createdUser);
   }
 
   @Post('forgot-password')
   @UsePipes(ValidationPipe)
-  forgotPassword(@Body() forgotPassword: { email: string }) {
+  @ApiResponse({ status: 200, description: 'Email with link sended' })
+  @HttpCode(200)
+  forgotPassword(@Body() forgotPassword: forgotPasswordDto) {
     return this.authService.forgotPassword(forgotPassword.email);
   }
+
   @Post('forgot-password/:id/:token')
   @UsePipes(ValidationPipe)
   resetPassword(
