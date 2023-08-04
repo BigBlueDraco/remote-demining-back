@@ -22,6 +22,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthUserRes } from './dto/auth-user-res';
 import { forgotPasswordDto } from './dto/forgot-password';
@@ -94,6 +95,7 @@ export class AuthController {
     type: AuthUserRes,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse()
   @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
   @UsePipes(ValidationPipe)
   @HttpCode(200)

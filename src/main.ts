@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import 'dotenv/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors();
   const swaggerConfig = new DocumentBuilder()
     .setTitle('remote-demining')
     .setDescription('API for CMS with authorization in the admin panel')
