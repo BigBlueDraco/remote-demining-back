@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 import { MailModule } from './mail/mail.module';
 import { ContentModule } from './content/content.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ContentModule } from './content/content.module';
     UserModule,
     MailModule,
     ContentModule,
+    ImagesModule,
   ],
   controllers: [],
   providers: [],
