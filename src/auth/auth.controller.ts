@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   Param,
@@ -51,13 +52,14 @@ export class AuthController {
     return await this.authService.login(createdUser);
   }
 
-  @Post('forgot-password')
+  @Get('forgot-password')
   @UsePipes(ValidationPipe)
   @ApiResponse({ status: 200, description: 'Email with link sended' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
   @HttpCode(200)
   forgotPassword(@Body() forgotPassword: forgotPasswordDto) {
+    console.log(forgotPassword);
     return this.authService.forgotPassword(forgotPassword.email);
   }
 
@@ -109,8 +111,12 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('ping')
-  test(@Body() createdUser: CreateUserDto) {
+  @Get('auth-ping')
+  test() {
+    return true;
+  }
+  @Get('ping')
+  ping() {
     return true;
   }
 }
