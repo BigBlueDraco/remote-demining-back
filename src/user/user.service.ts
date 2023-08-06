@@ -27,12 +27,20 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne({ email: email.toLowerCase() });
-    return user;
+    try {
+      const user = await this.userModel.findOne({ email: email.toLowerCase() });
+      return user;
+    } catch (err) {
+      throw err;
+    }
   }
   async findOneById(id: string) {
-    const user = await this.userModel.findById(id);
-    return user;
+    try {
+      const user = await this.userModel.findById(id);
+      return user;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
