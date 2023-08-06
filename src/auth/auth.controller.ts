@@ -52,7 +52,7 @@ export class AuthController {
     return await this.authService.login(createdUser);
   }
 
-  @Get('forgot-password')
+  @Post('forgot-password')
   @UsePipes(ValidationPipe)
   @ApiResponse({ status: 200, description: 'Email with link sended' })
   @ApiNotFoundResponse({ description: 'User not found' })
