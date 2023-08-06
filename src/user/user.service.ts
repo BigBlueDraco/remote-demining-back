@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,12 +18,8 @@ export class UserService {
       const result = await createdUser.save();
       return result;
     } catch (err) {
-      throw err;
+      throw new InternalServerErrorException(`${err}`);
     }
-  }
-
-  findAll() {
-    return `This action returns all user`;
   }
 
   async findOneByEmail(email: string) {
@@ -31,8 +27,12 @@ export class UserService {
     return user;
   }
   async findOneById(id: string) {
-    const user = await this.userModel.findById(id);
-    return user;
+    try {
+      const user = await this.userModel.findById(id);
+      return user;
+    } catch (e) {
+      throw new InternalServerErrorException(`${e}`);
+    }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -46,9 +46,5 @@ export class UserService {
     } catch (err) {
       throw err;
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

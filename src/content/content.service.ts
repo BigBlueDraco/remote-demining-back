@@ -1,19 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { Content } from './schemas/content.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class ContentService {
   constructor(
     @InjectModel('Content') private readonly contentModel: Model<Content>,
+    private readonly imagesService: ImagesService,
   ) {}
-  create(createContentDto: CreateContentDto) {
+  async create(createContentDto: CreateContentDto) {
     try {
-      return 'This action adds a new content';
-    } catch (e) {}
+      const imageIDs = [];
+      const { images, ...rest } = createContentDto;
+      if (images) {
+        const data = await this.imagesService.create({ blob: images[0] });
+        if (!data) {
+          throw data;
+        }
+        imageIDs.push(data.id);
+        console.log(imageIDs);
+      }
+      const content = new this.contentModel({
+        images: [...imageIDs],
+        ...rest,
+      });
+      const result = await content.save();
+      return result;
+    } catch (e) {
+      throw e;
+    }
   }
 
   findAll() {

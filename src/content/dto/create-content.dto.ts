@@ -9,11 +9,11 @@ import {
 export class CreateContentDto {
   @ApiProperty({
     description: 'An array of images as Blob objects',
-    example: [new Blob()],
-    type: [Blob],
+    example: new Blob(),
+    type: Blob,
   })
   @IsArray()
-  images: Blob[];
+  images: string;
 
   @ApiProperty({
     description: 'Data object',
