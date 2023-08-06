@@ -14,7 +14,7 @@ export class MailService {
         template: './test',
       });
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   }
   async sendForgotPasswordMail(data: {
@@ -33,6 +33,8 @@ export class MailService {
           name: data?.name || 'Адміне',
         },
       });
-    } catch (e) {}
+    } catch (e) {
+      throw e;
+    }
   }
 }
