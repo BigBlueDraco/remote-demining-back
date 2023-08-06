@@ -8,7 +8,7 @@ import { UserService } from 'src/user/user.service';
 import * as url from 'url';
 import { LoginDto } from './dto/login';
 import { PassworGroupDto } from './dto/password-group';
-import { SingupDto } from './dto/singup';
+import { SignupDto } from './dto/signup';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async singup(createUserDto: SingupDto) {
+  async signup(createUserDto: SignupDto) {
     try {
       const { email, ...passwordGroup } = createUserDto;
       this.checkPasswordConfirming(passwordGroup);
@@ -114,7 +114,7 @@ export class AuthService {
       }
       const secret = this.configService.get<string>('SECRET') + user.password;
       const payload: any = await jwt.verify(token, secret);
-      const hashedPassword = await hash(forgotPassword, 10);
+      const hashedPassword = await hash(forgotPassword.password, 10);
       return await this.userService.update(payload.id, {
         password: hashedPassword,
       });
