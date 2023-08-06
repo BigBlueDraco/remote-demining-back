@@ -1,15 +1,12 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image-dto';
-import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateImageDto } from './dto/create-image-dto';
 import { Image } from './schema/image.schema';
-import { error } from 'console';
 
 @Injectable()
 export class ImagesService {
@@ -19,14 +16,13 @@ export class ImagesService {
   checkBlobTypes(image: CreateImageDto) {
     try {
       const typeChecks = [
-        { type: 'data:', message: ' "data:" expected' },
-        { type: 'image/png;', message: 'image/png; expected' },
-        { type: 'image/jpeg;', message: 'image/jpeg; expected' },
-        { type: 'base64,', message: '"base64," expected' },
+        { type: 'data', message: ' "data:" expected' },
+        { type: 'image/png', message: 'image/png; expected' },
+        { type: 'base64', message: '"base64" expected' },
       ];
 
       const typeErrors = typeChecks
-        .filter((check) => !image.blob.includes(check.type))
+        .filter((check) => image.blob.includes(check.type))
         .map((check) => check.message)
         .join('; ');
 

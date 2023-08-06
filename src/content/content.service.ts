@@ -20,10 +20,11 @@ export class ContentService {
   ) {}
   async create(createContentDto: CreateContentDto) {
     try {
+      console.log(createContentDto);
       const imageIDs = [];
       const { images, ...rest } = createContentDto;
       if (images) {
-        const data = await this.imagesService.create({ blob: images[0] });
+        const data = await this.imagesService.create({ blob: images });
         if (!data) {
           throw data;
         }
@@ -36,17 +37,27 @@ export class ContentService {
       });
       const result = await content.save();
       return result;
-    } catch (e) {
-      throw e;
+    } catch (err) {
+      throw err;
     }
   }
 
-  findAll() {
-    return `This action returns all content`;
+  async findAll() {
+    try {
+      const content = await this.contentModel.find();
+      return content || [];
+    } catch (err) {
+      throw err;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} content`;
+  async findOne(id: number) {
+    try {
+      const content = await this.contentModel.findById(id);
+      return content || [];
+    } catch (err) {
+      throw err;
+    }
   }
 
   update(id: number, updateContentDto: UpdateContentDto) {
