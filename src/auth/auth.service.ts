@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
@@ -15,7 +9,6 @@ import * as url from 'url';
 import { LoginDto } from './dto/login';
 import { PassworGroupDto } from './dto/password-group';
 import { SingupDto } from './dto/singup';
-import { NOTFOUND } from 'dns';
 
 @Injectable()
 export class AuthService {
@@ -53,7 +46,7 @@ export class AuthService {
         user: { email: newUser.email },
       };
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   async login(loginUser: LoginDto) {
@@ -74,7 +67,7 @@ export class AuthService {
         user: { email: existUser.email },
       };
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
 
@@ -105,7 +98,7 @@ export class AuthService {
       });
       return 'Email send';
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   async resetPassword(
@@ -126,7 +119,7 @@ export class AuthService {
         password: hashedPassword,
       });
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   checkPasswordConfirming(passwordGroup: PassworGroupDto) {
@@ -154,7 +147,7 @@ export class AuthService {
       const { password: pass2, ...res } = rest['_doc'];
       return res;
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
 }
