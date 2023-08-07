@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   Param,
@@ -12,7 +13,7 @@ import {
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login';
-import { SingupDto } from './dto/singup';
+import { SignupDto } from './dto/signup';
 import { JwtAuthGuard } from './guards/JwtGuard';
 import { PassworGroupDto } from './dto/password-group';
 import {
@@ -33,13 +34,13 @@ import { ResetPasswordParams } from './dto/reset-password';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('singup')
+  @Post('signup')
   @ApiResponse({ status: 201, description: 'User created', type: AuthUserRes })
   @ApiConflictResponse({ description: 'User wit email already exists' })
   @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
-  singup(@Body() createdUser: SingupDto): Promise<AuthUserRes> {
-    return this.authService.singup(createdUser);
+  signup(@Body() createdUser: SignupDto): Promise<AuthUserRes> {
+    return this.authService.signup(createdUser);
   }
   @Post('login')
   @ApiResponse({ status: 200, description: 'All good', type: AuthUserRes })
@@ -58,6 +59,7 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @HttpCode(200)
   forgotPassword(@Body() forgotPassword: forgotPasswordDto) {
+    console.log(forgotPassword);
     return this.authService.forgotPassword(forgotPassword.email);
   }
 
@@ -109,8 +111,12 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('ping')
-  test(@Body() createdUser: CreateUserDto) {
+  @Get('auth-ping')
+  test() {
+    return true;
+  }
+  @Get('ping')
+  ping() {
     return true;
   }
 }

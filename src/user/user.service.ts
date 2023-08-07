@@ -23,15 +23,19 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne({ email: email.toLowerCase() });
-    return user;
+    try {
+      const user = await this.userModel.findOne({ email: email.toLowerCase() });
+      return user;
+    } catch (err) {
+      throw err;
+    }
   }
   async findOneById(id: string) {
     try {
       const user = await this.userModel.findById(id);
       return user;
-    } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+    } catch (err) {
+      throw err;
     }
   }
 

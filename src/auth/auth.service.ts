@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config/dist/config.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
@@ -14,8 +8,7 @@ import { UserService } from 'src/user/user.service';
 import * as url from 'url';
 import { LoginDto } from './dto/login';
 import { PassworGroupDto } from './dto/password-group';
-import { SingupDto } from './dto/singup';
-import { NOTFOUND } from 'dns';
+import { SignupDto } from './dto/signup';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +19,7 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
-  async singup(createUserDto: SingupDto) {
+  async signup(createUserDto: SignupDto) {
     try {
       const { email, ...passwordGroup } = createUserDto;
       this.checkPasswordConfirming(passwordGroup);
@@ -53,7 +46,7 @@ export class AuthService {
         user: { email: newUser.email },
       };
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   async login(loginUser: LoginDto) {
@@ -74,7 +67,7 @@ export class AuthService {
         user: { email: existUser.email },
       };
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
 
@@ -105,7 +98,7 @@ export class AuthService {
       });
       return 'Email send';
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   async resetPassword(
@@ -121,12 +114,12 @@ export class AuthService {
       }
       const secret = this.configService.get<string>('SECRET') + user.password;
       const payload: any = await jwt.verify(token, secret);
-      const hashedPassword = await hash(forgotPassword, 10);
+      const hashedPassword = await hash(forgotPassword.password, 10);
       return await this.userService.update(payload.id, {
         password: hashedPassword,
       });
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
   checkPasswordConfirming(passwordGroup: PassworGroupDto) {
