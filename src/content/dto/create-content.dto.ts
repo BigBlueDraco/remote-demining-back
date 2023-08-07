@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsBase64,
   IsNotEmpty,
   IsNotEmptyObject,
   IsObject,
@@ -12,7 +13,7 @@ export class CreateContentDto {
     example: new Blob(),
     type: Blob,
   })
-  @IsArray()
+  @IsBase64()
   images: string;
 
   @ApiProperty({

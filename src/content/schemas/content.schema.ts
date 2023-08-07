@@ -8,7 +8,7 @@ export const ContentSchema = new mongoose.Schema({
   dataSchema: { type: Object, require: true },
 });
 export interface Content {
-  images: string[];
+  images?: string[];
   data: any;
   dataSchema: any;
 }

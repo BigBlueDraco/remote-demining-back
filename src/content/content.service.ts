@@ -1,16 +1,10 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ImagesService } from 'src/images/images.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { Content } from './schemas/content.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { ImagesService } from 'src/images/images.service';
 
 @Injectable()
 export class ContentService {
@@ -20,7 +14,6 @@ export class ContentService {
   ) {}
   async create(createContentDto: CreateContentDto) {
     try {
-      console.log(createContentDto);
       const imageIDs = [];
       const { images, ...rest } = createContentDto;
       if (images) {
@@ -29,7 +22,6 @@ export class ContentService {
           throw data;
         }
         imageIDs.push(data.id);
-        console.log(imageIDs);
       }
       const content = new this.contentModel({
         images: [...imageIDs],
@@ -51,17 +43,57 @@ export class ContentService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const content = await this.contentModel.findById(id);
-      return content || [];
+      return content;
     } catch (err) {
       throw err;
     }
   }
 
-  update(id: number, updateContentDto: UpdateContentDto) {
-    return `This action updates a #${id} content`;
+  async update(id: string, updateContentDto: UpdateContentDto) {
+    try {
+      const { images, ...rest } = updateContentDto;
+      const imageIDs = [];
+      let updateData: any = { ...rest };
+
+      const content = await this.findOne(id);
+
+      if (!content) {
+        throw new NotFoundException(`Content with id: ${id} not found`);
+      }
+
+      if (images) {
+        if (content.images[0]) {
+          const { id: imgId } = await this.imagesService.update(
+            content.images[0],
+            {
+              blob: images,
+            },
+          );
+          imageIDs.push(imgId);
+        } else {
+          const data = await this.imagesService.create({ blob: images });
+          if (!data) {
+            throw data;
+          }
+          imageIDs.push(data.id);
+        }
+      }
+
+      if (imageIDs.length) {
+        updateData = { images: [...imageIDs], ...rest };
+      }
+      const updatedContent = await this.contentModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true },
+      );
+      return updatedContent;
+    } catch (err) {
+      throw err;
+    }
   }
 
   remove(id: number) {

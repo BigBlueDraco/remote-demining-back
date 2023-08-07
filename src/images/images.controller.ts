@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Readable } from 'stream';
 import { ImagesService } from './images.service';
-import { Readable, pipeline } from 'stream';
-import { createReadStream } from 'fs';
-import { join } from 'path';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Images')
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}

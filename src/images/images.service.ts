@@ -7,13 +7,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateImageDto } from './dto/create-image-dto';
 import { Image } from './schema/image.schema';
+import { UpdateImageDto } from './dto/update-image-dto';
 
 @Injectable()
 export class ImagesService {
   constructor(
     @InjectModel('Image') private readonly imageModel: Model<Image>,
   ) {}
-  checkBlobTypes(image: CreateImageDto) {
+  checkBlobTypes(image: any) {
     try {
       const typeChecks = [
         { type: 'data', message: ' "data:" expected' },
@@ -52,7 +53,22 @@ export class ImagesService {
       const image = await this.imageModel.findById(id);
       return image;
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
+    }
+  }
+  async update(id: string, updateImageDto: UpdateImageDto) {
+    try {
+      this.checkBlobTypes(updateImageDto);
+      const updatedImage = await this.imageModel.findByIdAndUpdate(
+        id,
+        { ...updateImageDto },
+        {
+          new: true,
+        },
+      );
+      return updatedImage;
+    } catch (e) {
+      throw e;
     }
   }
   async delete(id: string) {
@@ -61,7 +77,7 @@ export class ImagesService {
       await image.deleteOne({ id });
       return image;
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
 }

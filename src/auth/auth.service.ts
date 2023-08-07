@@ -154,7 +154,7 @@ export class AuthService {
       const { password: pass2, ...res } = rest['_doc'];
       return res;
     } catch (e) {
-      throw new InternalServerErrorException(`${e}`);
+      throw e;
     }
   }
 }
