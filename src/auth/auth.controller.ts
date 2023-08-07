@@ -36,7 +36,7 @@ export class AuthController {
   @Post('singup')
   @ApiResponse({ status: 201, description: 'User created', type: AuthUserRes })
   @ApiConflictResponse({ description: 'User wit email already exists' })
-  @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
+  @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
   singup(@Body() createdUser: SingupDto): Promise<AuthUserRes> {
     return this.authService.singup(createdUser);
@@ -44,7 +44,7 @@ export class AuthController {
   @Post('login')
   @ApiResponse({ status: 200, description: 'All good', type: AuthUserRes })
   @ApiConflictResponse({ description: 'User data is unvalid' })
-  @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
+  @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   async login(@Body() createdUser: LoginDto): Promise<AuthUserRes> {
@@ -55,7 +55,7 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   @ApiResponse({ status: 200, description: 'Email with link sended' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
+  @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @HttpCode(200)
   forgotPassword(@Body() forgotPassword: forgotPasswordDto) {
     return this.authService.forgotPassword(forgotPassword.email);
@@ -73,7 +73,7 @@ export class AuthController {
     type: AuthUserRes,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
+  @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   resetPassword(
@@ -96,7 +96,7 @@ export class AuthController {
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse()
-  @ApiInternalServerErrorResponse({ description: 'Oh, somthing went wrong' })
+  @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
   @HttpCode(200)
   changePassword(

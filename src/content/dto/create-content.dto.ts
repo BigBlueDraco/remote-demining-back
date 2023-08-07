@@ -9,9 +9,9 @@ import {
 
 export class CreateContentDto {
   @ApiProperty({
-    description: 'An array of images as Blob objects',
-    example: new Blob(),
-    type: Blob,
+    description: 'A base64 string of images',
+    example: 'asdkkadkakAJIJAKFmasmdkajsdjalsjdASDLSAJLDASdalsdalsd',
+    type: String,
   })
   @IsBase64()
   images: string;
