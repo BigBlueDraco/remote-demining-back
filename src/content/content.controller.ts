@@ -39,6 +39,6 @@ export class ContentController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.contentService.remove(+id);
+    return this.contentService.remove(id);
   }
 }

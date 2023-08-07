@@ -46,6 +46,9 @@ export class ContentService {
   async findOne(id: string) {
     try {
       const content = await this.contentModel.findById(id);
+      if (!content) {
+        throw new NotFoundException(`Content with ${id} not found`);
+      }
       return content;
     } catch (err) {
       throw err;
@@ -96,7 +99,17 @@ export class ContentService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} content`;
+  async remove(id: string) {
+    try {
+      const content = await this.findOne(id);
+      if (content.images.length) {
+        console.log(content.images[0]);
+        await this.imagesService.remove(content.images[0]);
+      }
+      await content.deleteOne({ id });
+      return content;
+    } catch (err) {
+      throw err;
+    }
   }
 }

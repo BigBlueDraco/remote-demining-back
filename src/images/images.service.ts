@@ -71,11 +71,13 @@ export class ImagesService {
       throw e;
     }
   }
-  async delete(id: string) {
+  async remove(id: string) {
     try {
       const image = await this.imageModel.findById(id);
-      await image.deleteOne({ id });
-      return image;
+      if (image) {
+        await image.deleteOne({ id });
+        return image;
+      }
     } catch (e) {
       throw e;
     }
