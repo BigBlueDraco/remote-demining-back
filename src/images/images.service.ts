@@ -40,6 +40,7 @@ export class ImagesService {
   }
   async create(image: CreateImageDto) {
     try {
+      console.log(!image.blob);
       this.checkBlobTypes(image);
       const newImage = new this.imageModel({
         ...image,

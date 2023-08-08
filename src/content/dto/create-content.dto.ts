@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsBase64,
-  IsNotEmpty,
-  IsNotEmptyObject,
-  IsObject,
-} from 'class-validator';
+import { IsNotEmpty, IsNotEmptyObject, IsObject } from 'class-validator';
 
 export class CreateContentDto {
   @ApiProperty({
@@ -13,7 +7,6 @@ export class CreateContentDto {
     example: 'asdkkadkakAJIJAKFmasmdkajsdjalsjdASDLSAJLDASdalsdalsd',
     type: String,
   })
-  @IsBase64()
   images: string;
 
   @ApiProperty({
