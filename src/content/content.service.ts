@@ -5,6 +5,7 @@ import { ImagesService } from 'src/images/images.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { Content } from './schemas/content.schema';
+import { ContentFilterDto } from './dto/content-filter.dto';
 
 @Injectable()
 export class ContentService {
@@ -33,10 +34,27 @@ export class ContentService {
       throw err;
     }
   }
-
-  async findAll() {
+  createFilter(obj: object) {
+    const filter = {};
+    let obj1;
+    for (const key in obj) {
+      if (typeof obj[key] === 'object') {
+        obj1 = this.createFilter(obj[`${key}`]);
+        for (const key1 in obj1) {
+          filter[key + '.' + key1] = obj1[key1];
+        }
+      } else {
+        filter[key] = obj[key];
+      }
+    }
+    return filter;
+  }
+  async findAll(body: ContentFilterDto) {
     try {
-      const content = await this.contentModel.find();
+      const filter = this.createFilter(body);
+
+      const content = await this.contentModel.find(filter);
+
       return content || [];
     } catch (err) {
       throw err;
