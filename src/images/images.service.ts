@@ -16,12 +16,14 @@ export class ImagesService {
   ) {}
   checkBlobTypes(image: any) {
     try {
+      if (!image.blob) {
+        return;
+      }
       const typeChecks = [
         { type: 'data', message: ' "data:" expected' },
         { type: 'image/png', message: 'image/png; expected' },
         { type: 'base64', message: '"base64" expected' },
       ];
-
       const typeErrors = typeChecks
         .filter((check) => image.blob.includes(check.type))
         .map((check) => check.message)
