@@ -14,11 +14,13 @@ import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ContentFilterDto } from './dto/content-filter.dto';
 
 @ApiTags('Content')
 @Controller('content')
@@ -26,9 +28,9 @@ export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
   @Post()
+  @UsePipes(ValidationPipe)
   @ApiCreatedResponse({ description: 'Content created' })
   @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
-  @UsePipes(ValidationPipe)
   create(@Body() createContentDto: CreateContentDto) {
     return this.contentService.create(createContentDto);
   }
@@ -37,9 +39,10 @@ export class ContentController {
   @ApiOkResponse({ description: 'OK' })
   @ApiInternalServerErrorResponse({ description: 'Oh, something went wrong' })
   @UsePipes(ValidationPipe)
+  @ApiBody({ type: ContentFilterDto, required: false })
   @HttpCode(200)
-  async findAll() {
-    return await this.contentService.findAll();
+  async findAll(@Body() body?: ContentFilterDto) {
+    return await this.contentService.findAll(body);
   }
 
   @Get(':id')
