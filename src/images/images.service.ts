@@ -1,13 +1,13 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateImageDto } from './dto/create-image-dto';
-import { Image } from './schema/image.schema';
 import { UpdateImageDto } from './dto/update-image-dto';
+import { Image } from './schema/image.schema';
 
 @Injectable()
 export class ImagesService {
@@ -40,7 +40,6 @@ export class ImagesService {
   }
   async create(image: CreateImageDto) {
     try {
-      console.log(!image.blob);
       this.checkBlobTypes(image);
       const newImage = new this.imageModel({
         ...image,
@@ -54,6 +53,9 @@ export class ImagesService {
   async findOne(id: string) {
     try {
       const image = await this.imageModel.findById(id);
+      if (!image) {
+        throw new NotFoundException(`Image with id: ${id}`);
+      }
       return image;
     } catch (e) {
       throw e;
