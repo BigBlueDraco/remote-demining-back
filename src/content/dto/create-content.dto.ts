@@ -4,8 +4,9 @@ import { IsNotEmpty, IsNotEmptyObject, IsObject } from 'class-validator';
 export class CreateContentDto {
   @ApiProperty({
     description: 'A base64 string of images',
-    example: 'asdkkadkakAJIJAKFmasmdkajsdjalsjdASDLSAJLDASdalsdalsd',
+    example: 'base64img',
     type: String,
+    required: false,
   })
   images: string;
 
@@ -13,6 +14,7 @@ export class CreateContentDto {
     description: 'Data object',
     example: { key: 'value' },
     type: Object,
+    required: true,
   })
   @IsNotEmpty()
   @IsObject()
@@ -23,6 +25,7 @@ export class CreateContentDto {
     description: 'Data schema object',
     example: { key: 'value' },
     type: Object,
+    required: true,
   })
   @IsNotEmpty()
   @IsObject()
