@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateImageDto } from './dto/create-image-dto';
@@ -49,9 +53,9 @@ export class ImagesService {
   async findOne(id: string) {
     try {
       const image = await this.imageModel.findById(id);
-      // if (!image) {
-      //   throw new NotFoundException(`Image with id: ${id}`);
-      // }
+      if (!image) {
+        throw new NotFoundException(`Image with id: ${id}`);
+      }
       return image;
     } catch (e) {
       throw e;
