@@ -28,6 +28,7 @@ import {
 import { AuthUserRes } from './dto/auth-user-res';
 import { forgotPasswordDto } from './dto/forgot-password';
 import { ResetPasswordParams } from './dto/reset-password';
+import { UserSafe } from 'src/user/entities/user-safe.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -94,7 +95,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Password updated',
-    type: AuthUserRes,
+    type: UserSafe,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse()

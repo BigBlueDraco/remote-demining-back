@@ -1,12 +1,20 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
+import {
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Readable } from 'stream';
 import { ImagesService } from './images.service';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Images')
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
+  @ApiOkResponse({ description: 'Return image.png' })
+  @ApiNotFoundResponse({ description: 'Image not found' })
+  @ApiInternalServerErrorResponse({ description: 'Oops, something went wrong' })
   @Get('/:id')
   async findOne(@Param('id') id: string, @Res() res: any) {
     const { blob } = await this.imagesService.findOne(id);
