@@ -54,6 +54,9 @@ export class ImagesService {
   async findOne(id: string) {
     try {
       const image = await this.imageModel.findById(id);
+      // if (!image) {
+      //   throw new NotFoundException(`Image with id: ${id}`);
+      // }
       return image;
     } catch (e) {
       throw e;
