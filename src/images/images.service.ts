@@ -1,13 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateImageDto } from './dto/create-image-dto';
-import { Image } from './schema/image.schema';
 import { UpdateImageDto } from './dto/update-image-dto';
+import { Image } from './schema/image.schema';
 
 @Injectable()
 export class ImagesService {
@@ -40,7 +36,6 @@ export class ImagesService {
   }
   async create(image: CreateImageDto) {
     try {
-      console.log(!image.blob);
       this.checkBlobTypes(image);
       const newImage = new this.imageModel({
         ...image,
