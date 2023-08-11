@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { isEmpty } from 'lodash';
 import { Model } from 'mongoose';
 import { ImagesService } from 'src/images/images.service';
+import { ContentFilterDto } from './dto/content-filter.dto';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { Content } from './schemas/content.schema';
-import { ContentFilterDto } from './dto/content-filter.dto';
 
 @Injectable()
 export class ContentService {
@@ -34,28 +35,32 @@ export class ContentService {
       throw err;
     }
   }
-  createFilter(obj: object) {
-    const filter = {};
-    let obj1;
-    for (const key in obj) {
-      if (typeof obj[key] === 'object') {
-        obj1 = this.createFilter(obj[`${key}`]);
-        for (const key1 in obj1) {
-          filter[key + '.' + key1] = obj1[key1];
+  /*TO DO  
+Додати кешування
+*/
+  filter(filter, obj) {
+    let res = false;
+    for (const key in filter) {
+      if (typeof filter[key] === 'object') {
+        if (typeof obj[key] !== 'object') {
+          return false;
         }
-      } else {
-        filter[key] = obj[key];
+        return (res = this.filter(filter[key], obj[key]));
       }
+      return (res = filter[key] === obj[key]);
     }
-    return filter;
+    return res;
   }
   async findAll(body: ContentFilterDto) {
     try {
-      const filter = this.createFilter(body);
-
-      const content = await this.contentModel.find(filter);
-
-      return content || [];
+      console.log(isEmpty(body));
+      const content = await this.contentModel.find();
+      const res = !isEmpty(body)
+        ? content.filter((elem) => {
+            return this.filter(body, elem);
+          })
+        : content;
+      return res || [];
     } catch (err) {
       throw err;
     }
