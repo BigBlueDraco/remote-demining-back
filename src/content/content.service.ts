@@ -51,13 +51,17 @@ export class ContentService {
     }
     return res;
   }
-  async findAll(body: ContentFilterDto) {
+  async findAll(query: ContentFilterDto) {
     try {
-      console.log(isEmpty(body));
+      const filter: any = {};
+      query.dataSchema
+        ? (filter.dataSchema = await JSON.parse(query.dataSchema))
+        : '';
+      query.data ? (filter.data = await JSON.parse(query.data)) : '';
       const content = await this.contentModel.find();
-      const res = !isEmpty(body)
+      const res = !isEmpty(filter)
         ? content.filter((elem) => {
-            return this.filter(body, elem);
+            return this.filter(filter, elem);
           })
         : content;
       return res || [];

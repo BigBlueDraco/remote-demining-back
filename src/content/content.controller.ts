@@ -7,14 +7,17 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ApiBody,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { ContentService } from './content.service';
@@ -46,10 +49,10 @@ export class ContentController {
   })
   @ApiInternalServerErrorResponse({ description: 'Oops, something went wrong' })
   @UsePipes(ValidationPipe)
-  @ApiBody({ type: ContentFilterDto, required: false })
+  @ApiQuery({ type: ContentFilterDto, required: false })
   @HttpCode(200)
-  async findAll(@Body() body?: ContentFilterDto) {
-    return await this.contentService.findAll(body);
+  async findAll(@Query() filter?: ContentFilterDto) {
+    return await this.contentService.findAll(filter);
   }
 
   @Get(':id')
