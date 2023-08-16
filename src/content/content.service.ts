@@ -14,17 +14,31 @@ export class ContentService {
     @InjectModel('Content') private readonly contentModel: Model<Content>,
     private readonly imagesService: ImagesService,
   ) {}
+  async createAndGetImagesId(images: string | string[]) {
+    const imageIDs: string[] = [];
+    if (!images) return [...imageIDs];
+    if (typeof images === 'string') {
+      const data = await this.imagesService.create({ blob: images });
+      if (!data) {
+        throw data;
+      }
+      imageIDs.push(data.id);
+      return [...imageIDs];
+    }
+    for (const elem of images) {
+      const data = await this.imagesService.create({ blob: elem });
+      if (!data) {
+        throw data;
+      }
+      imageIDs.push(data.id);
+    }
+    return [...imageIDs];
+  }
   async create(createContentDto: CreateContentDto) {
     try {
-      const imageIDs = [];
       const { images, ...rest } = createContentDto;
-      if (images) {
-        const data = await this.imagesService.create({ blob: images });
-        if (!data) {
-          throw data;
-        }
-        imageIDs.push(data.id);
-      }
+      const imageIDs = await this.createAndGetImagesId(images);
+      console.log(imageIDs);
       const content = new this.contentModel({
         images: [...imageIDs],
         ...rest,
