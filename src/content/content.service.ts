@@ -14,17 +14,30 @@ export class ContentService {
     @InjectModel('Content') private readonly contentModel: Model<Content>,
     private readonly imagesService: ImagesService,
   ) {}
+  async createAndGetImagesId(images: string | string[]) {
+    const imageIDs: string[] = [];
+    if (!images) return [...imageIDs];
+    if (typeof images === 'string') {
+      const data = await this.imagesService.create({ blob: images });
+      if (!data) {
+        throw data;
+      }
+      imageIDs.push(data.id);
+      return [...imageIDs];
+    }
+    for (const elem of images) {
+      const data = await this.imagesService.create({ blob: elem });
+      if (!data) {
+        throw data;
+      }
+      imageIDs.push(data.id);
+    }
+    return [...imageIDs];
+  }
   async create(createContentDto: CreateContentDto) {
     try {
-      const imageIDs = [];
       const { images, ...rest } = createContentDto;
-      if (images) {
-        const data = await this.imagesService.create({ blob: images });
-        if (!data) {
-          throw data;
-        }
-        imageIDs.push(data.id);
-      }
+      const imageIDs = await this.createAndGetImagesId(images);
       const content = new this.contentModel({
         images: [...imageIDs],
         ...rest,
@@ -85,7 +98,7 @@ export class ContentService {
   async update(id: string, updateContentDto: UpdateContentDto) {
     try {
       const { images, ...rest } = updateContentDto;
-      const imageIDs = [];
+      let imageIDs = [];
       let updateData: any = { ...rest };
 
       const content = await this.findOne(id);
@@ -93,22 +106,34 @@ export class ContentService {
       if (!content) {
         throw new NotFoundException(`Content with id: ${id} not found`);
       }
-
+      const tmp = content.images.slice(images.length);
+      if (tmp) {
+        for (const elem of tmp) {
+          await this.imagesService.remove(elem);
+        }
+      }
       if (images) {
         if (content.images[0]) {
-          const { id: imgId } = await this.imagesService.update(
-            content.images[0],
-            {
-              blob: images,
-            },
-          );
-          imageIDs.push(imgId);
-        } else {
-          const data = await this.imagesService.create({ blob: images });
-          if (!data) {
-            throw data;
+          for (let i = 0; i < images.length; i++) {
+            if (content.images[i]) {
+              const { id: imgId } = await this.imagesService.update(
+                content.images[i],
+                {
+                  blob: images[i],
+                },
+              );
+              imageIDs.push(imgId);
+            } else {
+              const data = await this.imagesService.create({ blob: images[i] });
+              if (!data) {
+                throw data;
+              }
+              imageIDs.push(data.id);
+            }
           }
-          imageIDs.push(data.id);
+        } else {
+          const array = [...(await this.createAndGetImagesId(images))];
+          imageIDs = [...array];
         }
       }
 
@@ -130,8 +155,9 @@ export class ContentService {
     try {
       const content = await this.findOne(id);
       if (content.images.length) {
-        console.log(content.images[0]);
-        await this.imagesService.remove(content.images[0]);
+        for (const elem of content.images) {
+          await this.imagesService.remove(elem);
+        }
       }
       await content.deleteOne({ id });
       return content;
