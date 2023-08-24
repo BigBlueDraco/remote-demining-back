@@ -106,10 +106,12 @@ export class ContentService {
       if (!content) {
         throw new NotFoundException(`Content with id: ${id} not found`);
       }
-      const tmp = content.images.slice(images.length);
-      if (tmp) {
-        for (const elem of tmp) {
-          await this.imagesService.remove(elem);
+      if (images) {
+        const tmp = content.images.slice(images.length);
+        if (tmp) {
+          for (const elem of tmp) {
+            await this.imagesService.remove(elem);
+          }
         }
       }
       if (images) {
@@ -135,6 +137,8 @@ export class ContentService {
           const array = [...(await this.createAndGetImagesId(images))];
           imageIDs = [...array];
         }
+      } else {
+        imageIDs = [...content.images];
       }
 
       if (imageIDs.length) {
