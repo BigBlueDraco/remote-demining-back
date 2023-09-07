@@ -55,6 +55,9 @@ export class AuthService {
       const existUser = await this.userService.findOneByEmail(
         email.toLowerCase(),
       );
+      if (!existUser) {
+        throw new HttpException(`Unvalid user data`, HttpStatus.CONFLICT);
+      }
       const isValidPassword = await compare(password, existUser.password);
       if (!isValidPassword) {
         throw new HttpException(`Unvalid user data`, HttpStatus.CONFLICT);
