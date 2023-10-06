@@ -1,0 +1,43 @@
+on:
+  push:
+    branches:
+      - main
+name: 🚀 Deploy website on push
+env:
+  MONGO_URL: ${{secrets.MONGO_URL}}
+  HOST: "8080"
+  JWT_SECRET: ${{secrets.JWT}}
+  JWT_LIFE_TIME: ${{secrets.JWT_LIFE_TIME}}
+
+  CLIENT_URL: ${{secrets.CLIENT_URL}}
+
+  SMTP: ${{secrets.SMTP}}
+  GMAIL_LOGIN: ${{secrets.GMAIL_LOGIN}}
+  GMAIL_PASS: ${{secrets.GMAIL_PASS}}
+  
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: 🔨 Build Project
+        run: |
+          npm run build
+          npm run start:prod
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.GIT_CPANEL_REACT_SERVER }}
+          username: ${{ secrets.GIT_CPANEL_REACT_USER }}
+          password: ${{ secrets.GIT_CPANEL_REACT_PASSWORD }}
+          protocol: ${{ secrets.GIT_CPANEL_REACT_PROTOCOL }}
+          local-dir: ./dist/
